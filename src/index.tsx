@@ -3,23 +3,60 @@ import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-n
 import { sprintf } from 'sprintf-js';
 
 interface IProps {
+	/**
+	 * 倒计时的截止时间
+	 */
 	until: number;
+	/**
+	 * 组件大小
+	 */
 	size?: number;
+	/**
+	 * 时间标签样式
+	 */
 	timeLabelStyle?: StyleProp<TextStyle>;
+	/**
+	 * 分隔符样式
+	 */
 	separatorStyle?: StyleProp<TextStyle>;
+	/**
+	 * 数字样式
+	 */
 	digitStyle?: StyleProp<ViewStyle>;
+	/**
+	 * 数字文本样式
+	 */
 	digitTxtStyle?: StyleProp<TextStyle>;
+	/**
+	 * 显示的格式[‘D’,’H’,’M’,’S’]
+	 */
 	timeToShow?: string[];
+	/**
+	 * 文本要在时间标签中显示(如：{ d: ‘天’;h: ‘时’;m: ‘分’;s: ‘秒’; })
+	 */
 	timeLabels?: {
 		d: string;
 		h: string;
 		m: string;
 		s: string;
 	};
+	/**
+	 * 是否显示分隔符
+	 */
 	showSeparator?: boolean;
+	/**
+	 * 组件样式
+	 */
 	style?: StyleProp<ViewStyle>;
+	/**
+	 * 倒计时结束事件
+	 */
 	onFinish?(): void;
-	onChange?(until: number): void;
+	/**
+	 * 时间改变，注:如果界面到后台之后，事件不触发
+	 * @param left 剩余时间
+	 */
+	onChange?(left: number): void;
 }
 
 const default_props = {
@@ -50,9 +87,9 @@ export default function CountDown(p: IProps) {
 	};
 	const u = useMemo(() => {
 		if (props.until > 0) {
-			return now() + props.until;
+			return props.until;
 		}
-		return 0;
+		return now();
 	}, [props.until]);
 	const [left, setleft] = useState(u - now());
 	const { timeToShow, timeLabels, showSeparator } = props;
