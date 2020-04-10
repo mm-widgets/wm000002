@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { sprintf } from 'sprintf-js';
 
@@ -39,35 +39,48 @@ const default_props = {
 	timeToShow: ['D', 'H', 'M', 'S']
 };
 
+function now() {
+	return parseInt(String(new Date().getTime() / 1000), 10);
+}
+
 export default function CountDown(p: IProps) {
 	const props = {
 		...default_props,
 		...p
 	};
-	const [until, setuntil] = useState(props.until);
+	const u = useMemo(() => {
+		if (props.until > 0) {
+			return now() + props.until;
+		}
+		return 0;
+	}, [props.until]);
+	const [left, setleft] = useState(u - now());
 	const { timeToShow, timeLabels, showSeparator } = props;
-	const { days, hours, minutes, seconds } = getTimeLeft(until, timeToShow);
+	const { days, hours, minutes, seconds } = getTimeLeft(left, timeToShow);
 	const newTime = sprintf('%02d:%02d:%02d:%02d', days, hours, minutes, seconds).split(':');
 	useEffect(() => {
 		const timer = setInterval(() => {
-			if (until === 0) {
+			const l = u - now();
+			if (l <= 0) {
 				if (props.onFinish) {
 					props.onFinish();
 				}
 				if (props.onChange) {
-					props.onChange(until);
+					props.onChange(l);
 				}
+				setleft(0);
+				clearInterval(timer);
 			} else {
 				if (props.onChange) {
-					props.onChange(until);
+					props.onChange(l);
 				}
-				setuntil(until - 1);
+				setleft(l);
 			}
 		}, 1000);
 		return () => {
 			clearInterval(timer);
 		};
-	}, [until, props]);
+	}, [u, props]);
 	function renderDigit(d: string) {
 		const { digitStyle, digitTxtStyle, size } = props;
 		return (
@@ -139,7 +152,7 @@ export default function CountDown(p: IProps) {
 	);
 }
 
-function getTimeLeft(until: number, timeToShow: string[]) {
+function getTimeLeft(left: number, timeToShow: string[]) {
 	const obj = {
 		days: 0,
 		hours: 0,
@@ -151,22 +164,22 @@ function getTimeLeft(until: number, timeToShow: string[]) {
 	const m = timeToShow.includes('M');
 	const s = timeToShow.includes('S');
 	if (d) {
-		obj.days = parseInt((until / 86400).toString(), 10);	// 60* 60 *24
+		obj.days = parseInt((left / 86400).toString(), 10);	// 60* 60 *24
 	}
 	if (d && h) {
-		obj.hours = parseInt((until / 3600).toString(), 10) % 24;	// 60 * 60
+		obj.hours = parseInt((left / 3600).toString(), 10) % 24;	// 60 * 60
 	} else if (!d && h) {
-		obj.hours = parseInt((until / 3600).toString(), 10);
+		obj.hours = parseInt((left / 3600).toString(), 10);
 	}
 	if (m && (d || h)) {
-		obj.minutes = parseInt((until / 60).toString(), 10) % 60;
+		obj.minutes = parseInt((left / 60).toString(), 10) % 60;
 	} else if (!(d || h) && m) {
-		obj.minutes = parseInt((until / 60).toString(), 10);
+		obj.minutes = parseInt((left / 60).toString(), 10);
 	}
 	if (s && (d || h || m)) {
-		obj.seconds = until % 60;
+		obj.seconds = left % 60;
 	} else if (!(d || h || m) && s) {
-		obj.seconds = until;
+		obj.seconds = left;
 	}
 	return obj;
 }
