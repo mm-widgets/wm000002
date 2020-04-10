@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { sprintf } from 'sprintf-js';
 
+type tmType = 'D' | 'H' | 'M' | 'S';
+
 interface IProps {
 	/**
 	 * 倒计时的截止时间
@@ -30,7 +32,7 @@ interface IProps {
 	/**
 	 * 显示的格式[‘D’,’H’,’M’,’S’]
 	 */
-	timeToShow?: string[];
+	timeToShow?: tmType[];
 	/**
 	 * 文本要在时间标签中显示(如：{ d: ‘天’;h: ‘时’;m: ‘分’;s: ‘秒’; })
 	 */
@@ -73,7 +75,7 @@ const default_props = {
 		m: 'Minutes',
 		s: 'Seconds'
 	},
-	timeToShow: ['D', 'H', 'M', 'S']
+	timeToShow: ['D', 'H', 'M', 'S'] as tmType[]
 };
 
 function now() {
