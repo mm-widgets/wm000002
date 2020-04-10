@@ -1,6 +1,6 @@
 {
 	"name": "@mmstudio/wm000002",
-	"version": "1.0.202004091615",
+	"version": "1.0.202004100919",
 	"description": "倒计时",
 	"scripts": {
 		"test": "tsc -w",
