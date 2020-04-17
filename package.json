@@ -13,6 +13,7 @@
 		"type": "https+git",
 		"url": "https://github.com/mm-widgets/wm000002.git"
 	},
+	"homepage": "https://mm-works.github.io",
 	"main": "dist/index.js",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
